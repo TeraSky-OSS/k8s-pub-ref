@@ -1,0 +1,70 @@
+# Developer Role in Dev Environment
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: dev
+  name: developer-role
+rules:
+- apiGroups: ["*"]
+  resources: ["*"]
+  verbs: ["*"]
+# Exclude specific capabilities using Aqua/Kyverno
+
+# Developer Role in QA Environment - View Only
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: qa
+  name: developer-role
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services"]
+  verbs: ["get", "list", "watch"]
+
+# Platform Owner - Cluster Admin across all TKG clusters
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: platform-owner-role
+rules:
+- apiGroups: ["*"]
+  resources: ["*"]
+  verbs: ["*"]
+
+# DevOps Role - Admin inside the cluster, excluding management cluster
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: devops-role
+rules:
+- apiGroups: ["*"]
+  resources: ["*"]
+  verbs: ["*"]
+# Exclude management cluster permissions
+
+# DataOps Role - Database and Machine Deployment
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: dataops
+  name: dataops-role
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services", "statefulsets"]
+  verbs: ["create", "delete", "get", "list", "watch"]
+# Use Vault for managing credentials
+
+# Infra Developer Role - Namespace Admin and Read-Only on other namespaces
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: infra-dev
+  name: infra-developer-role
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services"]
+  verbs: ["get", "list", "watch", "create", "delete"]
+- apiGroups: ["apps", "extensions"]
+  resources: ["deployments", "replicasets"]
+  verbs: ["get", "list", "watch", "create", "delete"]
+# ClusterRoleBinding instead of RoleBinding to extend permissions across namespaces
